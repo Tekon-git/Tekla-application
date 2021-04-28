@@ -1,0 +1,212 @@
+﻿<Window x:Class="GridBuilder.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GridBuilder" 
+        xmlns:usercontrols="clr-namespace:GridBuilder.UserControls" 
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors" 
+        xmlns:b="clr-namespace:GridBuilder.Infrastructure.Behaviours" 
+        xmlns:converters="clr-namespace:GridBuilder.Infrastructure.Converters"
+        xmlns:viewmodels ="clr-namespace:GridBuilder.ViewModels"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="500" Width="800" ResizeMode="CanResizeWithGrip" WindowStyle="None">
+    <Window.Resources>
+        <Storyboard x:Key="MinimizeStatePanel">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" 
+                                           Storyboard.TargetName="MainAnimatedMenuGrid">
+                <EasingDoubleKeyFrame KeyTime="0" Value="250"></EasingDoubleKeyFrame>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="30"></EasingDoubleKeyFrame>
+            </DoubleAnimationUsingKeyFrames>
+            <StringAnimationUsingKeyFrames Storyboard.TargetProperty="(ContentControl.Content)"
+                                           Storyboard.TargetName="btn_MinMaxStatePanel">
+                <DiscreteStringKeyFrame Value="&gt;" KeyTime="0"></DiscreteStringKeyFrame>
+                <DiscreteStringKeyFrame Value="&lt;" KeyTime="0:0:0:4"></DiscreteStringKeyFrame>
+            </StringAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Key="MaximizeStatePanel">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" 
+                                           Storyboard.TargetName="MainAnimatedMenuGrid">
+                <EasingDoubleKeyFrame KeyTime="0" Value="30"></EasingDoubleKeyFrame>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="250"></EasingDoubleKeyFrame>
+            </DoubleAnimationUsingKeyFrames>
+            <StringAnimationUsingKeyFrames Storyboard.TargetProperty="(ContentControl.Content)"
+                                           Storyboard.TargetName="btn_MinMaxStatePanel">
+                <DiscreteStringKeyFrame Value="&lt;" KeyTime="0"></DiscreteStringKeyFrame>
+                <DiscreteStringKeyFrame Value="&gt;" KeyTime="0:0:0:4"></DiscreteStringKeyFrame>
+            </StringAnimationUsingKeyFrames>
+        </Storyboard>
+        <converters:StringToListConverter x:Key="StringToListConverter"></converters:StringToListConverter>
+        <converters:StringToDoubleArrayConverter x:Key="StringToDoubleArrayConverter"></converters:StringToDoubleArrayConverter>
+        <converters:StringToArrayStringConverter x:Key="StringToArrayStringConverter"></converters:StringToArrayStringConverter>
+
+    </Window.Resources>
+    <Window.DataContext>
+        <viewmodels:MainWindowViewModel></viewmodels:MainWindowViewModel>
+    </Window.DataContext>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition Width="5"></ColumnDefinition>
+            <ColumnDefinition Width="auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition Height="50"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Background="{StaticResource NIPDarkGreyBrush}">
+            <i:Interaction.Behaviors>
+                <b:WindowTitleBarDragBehavior></b:WindowTitleBarDragBehavior>
+            </i:Interaction.Behaviors>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,1,0">
+                <StackPanel.Resources>
+                    <Style TargetType="{x:Type Path}">
+                        <Setter Property="Stroke" Value="{StaticResource NIPGoldBrush}"></Setter>
+                        <Setter Property="StrokeThickness" Value="1"></Setter>
+                        <Setter Property="Margin" Value="5"></Setter>
+                    </Style>
+                </StackPanel.Resources>
+                <Button Margin="2,4" Background="#8C8B96">
+                    <i:Interaction.Behaviors>
+                        <b:WindowStateChangeBehavior></b:WindowStateChangeBehavior>
+                    </i:Interaction.Behaviors>
+                    <Path Data="{StaticResource MinimizeButtonIconGeometry}"></Path>
+                </Button>
+                <Button Margin="2,4" Background="#8C8B96">
+                    <i:Interaction.Behaviors>
+                        <b:CloseWindowBehavior></b:CloseWindowBehavior>
+                    </i:Interaction.Behaviors>
+                    <Path Data="{StaticResource CloseButtonIconGeometry}"></Path>
+                </Button>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Background="{StaticResource NIPDarkGreyBrush}">
+            <Label Content="Tekon" Foreground="{StaticResource NIPWhiteBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"></Label>
+        </Grid>
+        <Grid Grid.Row="1" Grid.Column="1" Background="{StaticResource NIPDarkGreyBrush}">
+        </Grid>
+        <Grid Grid.Row="1" Grid.Column="0" x:Name="grid_Parent">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="Loaded">
+                    <i:InvokeCommandAction Command="{Binding ResizeCommand}" CommandParameter="{Binding ElementName=grid_Parent}"></i:InvokeCommandAction>
+                </i:EventTrigger>
+                <i:EventTrigger EventName="SizeChanged">
+                    <i:InvokeCommandAction Command="{Binding ResizeCommand}" CommandParameter="{Binding ElementName=grid_Parent}"></i:InvokeCommandAction>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <Path Stroke="Black" StrokeThickness="2" Data="{Binding GridGeometr, UpdateSourceTrigger=PropertyChanged}"></Path>
+        </Grid>
+        <Grid x:Name="MainAnimatedMenuGrid" Grid.Row="1" Grid.Column="2" Width="250">
+            <Button x:Name="btn_MinMaxStatePanel" Click="btn_MinMaxStatePanel_Click"  Width="30" Height="30" HorizontalAlignment="Right" VerticalAlignment="Top">></Button>
+            <Grid Margin="0,30,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition Height="30"></RowDefinition>
+                    
+                </Grid.RowDefinitions>
+                <usercontrols:PanelDropDownList HeaderText="Axis" Margin="0,30,0,0" VerticalAlignment="Top">
+                    <usercontrols:PanelDropDownList.AdditionalContent>
+                        <Grid>
+                            
+                            <Grid.RowDefinitions>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" Height="30">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="0.2*"></ColumnDefinition>
+                                    <ColumnDefinition Width="0.8*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Label HorizontalContentAlignment="Center" >X</Label>
+                                <TextBox Grid.Column="1" VerticalContentAlignment="Center" PreviewKeyDown="TextBox_PreviewKeyDown"
+                                         Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}},
+                                    Path=DataContext.ListValueX,
+                                    UpdateSourceTrigger=LostFocus, Mode=TwoWay,
+                                    Converter={StaticResource StringToListConverter}}">
+                                    
+                                </TextBox>
+                            </Grid>
+                            <Grid Grid.Row="1" Height="30">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="0.2*"></ColumnDefinition>
+                                    <ColumnDefinition Width="0.8*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Label HorizontalContentAlignment="Center" >Y</Label>
+                                <TextBox Grid.Column="1" VerticalContentAlignment="Center" PreviewKeyDown="TextBox_PreviewKeyDown"
+                                         Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}},
+                                    Path=DataContext.ListValueY,
+                                    UpdateSourceTrigger=LostFocus, Mode=TwoWay,
+                                    Converter={StaticResource StringToListConverter}}"></TextBox>
+                            </Grid>
+                            <Grid Grid.Row="2" Height="30">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="0.2*"></ColumnDefinition>
+                                    <ColumnDefinition Width="0.8*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Label HorizontalContentAlignment="Center" >Z</Label>
+                                <TextBox Grid.Column="1" VerticalContentAlignment="Center" PreviewKeyDown="TextBox_PreviewKeyDown"
+                                         Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}},
+                                    Path=DataContext.ListValueZ,
+                                    UpdateSourceTrigger=LostFocus, Mode=TwoWay,
+                                    Converter={StaticResource StringToDoubleArrayConverter}}"></TextBox>
+                            </Grid>
+                        </Grid>
+                    </usercontrols:PanelDropDownList.AdditionalContent>
+                </usercontrols:PanelDropDownList>
+                <usercontrols:PanelDropDownList Grid.Row="1" HeaderText="Label" Margin="0,30,0,0" VerticalAlignment="Top">
+                    <usercontrols:PanelDropDownList.AdditionalContent>
+                        <Grid>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" Height="30">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="0.2*"></ColumnDefinition>
+                                    <ColumnDefinition Width="0.8*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Label HorizontalContentAlignment="Center" >X</Label>
+                                <TextBox Grid.Column="1" VerticalContentAlignment="Center" PreviewKeyDown="TextBox_PreviewKeyDown"
+                                         Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}},
+                                    Path=DataContext.ListMarkX,
+                                    UpdateSourceTrigger=LostFocus, Mode=TwoWay,
+                                    Converter={StaticResource StringToArrayStringConverter}}"></TextBox>
+                            </Grid>
+                            <Grid Grid.Row="1" Height="30">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="0.2*"></ColumnDefinition>
+                                    <ColumnDefinition Width="0.8*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Label HorizontalContentAlignment="Center" >Y</Label>
+                                <TextBox Grid.Column="1" VerticalContentAlignment="Center" PreviewKeyDown="TextBox_PreviewKeyDown"
+                                         Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}},
+                                    Path=DataContext.ListMarkY,
+                                    UpdateSourceTrigger=LostFocus, Mode=TwoWay,
+                                    Converter={StaticResource StringToArrayStringConverter}}">
+                                </TextBox>
+                            </Grid>
+                            <Grid Grid.Row="2" Height="30">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="0.2*"></ColumnDefinition>
+                                    <ColumnDefinition Width="0.8*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Label HorizontalContentAlignment="Center" >Z</Label>
+                                <TextBox Grid.Column="1" VerticalContentAlignment="Center" PreviewKeyDown="TextBox_PreviewKeyDown"
+                                         Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}},
+                                    Path=DataContext.ListMarkZ,
+                                    UpdateSourceTrigger=LostFocus, Mode=TwoWay,
+                                    Converter={StaticResource StringToArrayStringConverter}}"></TextBox>
+                            </Grid>
+                        </Grid>
+                    </usercontrols:PanelDropDownList.AdditionalContent>
+                </usercontrols:PanelDropDownList>
+                <Button Grid.Row="2" Margin="10,0" Command="{Binding CreateTSObjectCommand}" >Create</Button>   
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
