@@ -48,7 +48,7 @@ namespace HangMan
                 string mysteryWord = randomWord.Trim();
 
 
-                Console.WriteLine(mysteryWord);
+                //Console.WriteLine(mysteryWord);
 
                 char[] guess = new char[mysteryWord.Length];
 
